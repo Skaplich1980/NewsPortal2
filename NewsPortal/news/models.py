@@ -24,6 +24,8 @@ class Author(models.Model):
 class Category(models.Model): # Категории новостей/статей
     name = models.CharField(max_length=100, unique=True)
 
+    def __str__(self):
+        return self.name()  #return self.name.title()
 
 class Post(models.Model): # статьи и новости, которые создают пользователи
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
@@ -59,6 +61,8 @@ class Post(models.Model): # статьи и новости, которые со�
     def preview(self):
         return self.text[0:128]+'...'
 
+    def __str__(self):
+        return '<'self.name()+'> ...'+self.text()[0:20]
 
 class PostCategory(models.Model): # Промежуточная модель для связи «многие ко многим»w
 
@@ -92,4 +96,6 @@ class Comment(models.Model):
         self.rank -= 1
         self.save
 
+    def __str__(self):
+        return self.text()[0:20]
 

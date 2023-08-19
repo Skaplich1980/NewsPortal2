@@ -15,4 +15,6 @@ urlpatterns = [
    # int — указывает на то, что принимаются только целочисленные значения
    path('<int:pk>/', PostDetail.as_view(), name='post_detail'),
    #path('pages/', include('django.contrib.flatpages.urls')),
+
+   path('search/', news_search_f, name='news_search'), # поиск новостей
 ]

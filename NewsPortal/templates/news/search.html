@@ -1,0 +1,16 @@
+{% extends 'news/posts.html' %}
+{% load i18n %}
+{% load fuck_filter %}
+{% load custom_filters %}
+{% load custom_tags %}
+
+{% block search %}
+<h1> Поиск по новостям </h1>
+
+    <form action="" method="get">
+       {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}
+       {{ filterset.form.as_p }}
+       {# Добавим кнопку отправки данных формы #}
+       <input type="submit" value="{% trans "Найти" %}" />
+   </form>
+{% endblock search %}

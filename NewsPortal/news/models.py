@@ -93,13 +93,17 @@ class Author(models.Model):
 class Category(models.Model): # Категории новостей/статей
 
     #CATEGORY_NEWS определен в файле params
+    name = models.CharField(max_length=255, unique=True)  # название категории, уникальное поле
+    subscribers = models.ManyToManyField(User, through='SubscribersCategory')  # категории публикаций
 
-    category_new = models.CharField(max_length=2, choices=CATEGORY_NEWS, unique=True)
+    #category_new = models.CharField(max_le1ngth=2, choices=CATEGORY_NEWS, unique=True)
 
 
-def __str__(self):
+    def __str__(self):
         return self.name()  #return self.name.title()
 
+    #def get_absolute_url(self):
+    #    return reverse('category', kwargs={'cat_id': self.pk})
 
 
 class PostCategory(models.Model): # Промежуточная модель для связи «многие ко многим»w
@@ -110,5 +114,9 @@ class PostCategory(models.Model): # Промежуточная модель дл
     CategoryLink = models.ForeignKey(Category, on_delete=models.CASCADE)
     # связь «один ко многим» с моделью Category
 
+
+class SubscribersCategory(models.Model):   # промежуточная таблица для связи много-к-многим
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)     # ид пользователя
+    category_id = models.ForeignKey(Category, on_delete=models.CASCADE)     # ид категории
 
 

@@ -10,14 +10,14 @@ class NewsFilter(FilterSet):
         model = Post
         fields = {
             # поиск по названию
-            'header': ['icontains'],
+            'title': ['icontains'],
             # поиск по тексту
             'text': ['icontains'],
             # поиск по типу
             #'categoryType': ['exact'],
         }
         labels = {
-            'header': 'Заголовок публикации',
+            'title': 'Заголовок публикации',
             'text': 'Текст публикации',
             #'types': 'Тип',
         }

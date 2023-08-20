@@ -1,12 +1,17 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpResponseRedirect
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post
-from .filters import NewsFilter
-from params import *
+from .filters import *
+from .forms import *
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.utils import timezone
 import pytz
-#from .forms import PostForm
+from django.utils.translation import gettext as _
+from django.utils import timezone
+from .models import POST_TYPES, news as string_news, article as string_article
+
+
 
 paginator_count = 10 # вынесли константу для использования в нескольких местах кода
 # кол-во отображаемых на страніце новостей
@@ -68,4 +73,26 @@ def news_search_f(request):
     }
 
     return render(request, 'news/search.html', context=context)
+
+class NewsCreate(CreateView):
+    # Указываем нашу разработанную форму
+    form_class = PostForm
+    # модель товаров
+    model = Post
+    # и новый шаблон, в котором используется форма.
+    template_name = 'news/post_edit.html'
+
+    def form_valid(self, form):
+        news = form.save(commit=False)
+        news.categoryType = string_news
+        #author = Author.objects.get(user_id=self.request.user)  # берем автора новости, который зашел в систему
+        news.author_id = 1
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show_title'] = _('Создание новости:')
+        context['current_time'] = timezone.localtime(timezone.now())
+        context['timezones'] = pytz.common_timezones
+        return context
 

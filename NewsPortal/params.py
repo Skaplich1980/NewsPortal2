@@ -1,10 +1,10 @@
-NEWS = 'NW'
-ARTICLE = 'AR'
+news = 'NS'
+article = 'AR'
 
-CATEGORY_CHOISES = (
-    (NEWS, 'News'),
-    (ARTICLE, 'Article'),
-)
+POST_TYPES = [
+    (news, 'Новость'),
+    (article, 'Статья'),
+    ]
 
 world_events = 'WE'
 politics = 'PO'
@@ -23,11 +23,4 @@ CATEGORY_NEWS = [
 
 ]
 
-news = 'NS'
-article = 'AR'
-
-POST_TYPES = [
-    (news, 'Новость'),
-    (article, 'Статья'),
-]
 

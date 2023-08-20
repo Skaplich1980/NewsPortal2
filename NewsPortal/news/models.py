@@ -5,14 +5,39 @@ from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.urls import reverse
 
+news = 'NS'
+article = 'AR'
+
+POST_TYPES = [
+    (news, 'Новость'),
+    (article, 'Статья'),
+]
+
+# world_events = 'WE'
+# politics = 'PO'
+# culture = 'CU'
+# economics = 'EC'
+# science = 'SC'
+# sport='SP'
+#
+# CATEGORY_NEWS = [
+#     (world_events, 'мировые события'),
+#     (politics, 'политика'),
+#     (culture, 'культура'),
+#     (economics, 'экономика'),
+#     (science, 'наука'),
+#     (sport, 'спорт')
+#
+# ]
+
 class Post(models.Model): # статьи и новости, которые создают пользователи
     author = models.ForeignKey('Author', on_delete=models.CASCADE)
     # связь «один ко многим» с моделью Author
 
-    header = models.CharField(max_length=255)
+    #  удаление header = models.CharField(max_length=255) - title поле
     # заголовок публикации
 
-    categoryType = models.CharField(max_length=80, choices=CATEGORY_CHOISES, default=ARTICLE)
+    categoryType = models.CharField(max_length=80, choices=POST_TYPES, default=news)
     # поле с выбором — «статья» или «новость», по умолчанию статья
     # CATEGORY_CHOISES описан в файле параметров params
 
@@ -24,6 +49,9 @@ class Post(models.Model): # статьи и новости, которые со�
 
     title =models.CharField(max_length=150)
     # заголовок статьи/новости
+
+    show_title = models.CharField(max_length=100)
+    # отображение в шаблонах
 
     text=models.TextField()
     # текст статьи/новости
@@ -45,7 +73,8 @@ class Post(models.Model): # статьи и новости, которые со�
     def __str__(self):
         return self.header
 
-
+    def get_absolute_url(self):
+        return reverse('post_detail', args=[str(self.id)])
 
 class Comment(models.Model):
     commentPost = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -92,7 +121,6 @@ class Author(models.Model):
 
 class Category(models.Model): # Категории новостей/статей
 
-    #CATEGORY_NEWS определен в файле params
     name = models.CharField(max_length=255, unique=True)  # название категории, уникальное поле
     subscribers = models.ManyToManyField(User, through='SubscribersCategory')  # категории публикаций
 
@@ -100,7 +128,7 @@ class Category(models.Model): # Категории новостей/статей
 
 
     def __str__(self):
-        return self.name()  #return self.name.title()
+        return self.name  #return self.name.title()
 
     #def get_absolute_url(self):
     #    return reverse('category', kwargs={'cat_id': self.pk})

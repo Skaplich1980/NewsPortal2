@@ -4,7 +4,7 @@ from django_filters import FilterSet
 from .models import *
 
 class NewsFilter(FilterSet):
-    #row_date = django_filters.DateFilter(field_name='date_create', lookup_expr='gt', widget=DateInput(attrs={'type': 'date'}))
+    row_date = django_filters.DateFilter(field_name='date_create', lookup_expr='gt', widget=DateInput(attrs={'type': 'date'}))
 
     class Meta:
         model = Post

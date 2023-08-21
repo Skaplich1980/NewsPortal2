@@ -17,11 +17,13 @@ urlpatterns = [
    #path('pages/', include('django.contrib.flatpages.urls')),
    path('search/', news_search_f, name='news_search'), # поиск новостей
    path('create/', NewsCreate.as_view(), name='news_create'),
+   path('<int:pk>/edit/', PostEdit.as_view(), name='news_edit'),
+   # сделать кнопку править новость  просмотре
 
 # path('category/<int:cat_id>/', show_category, name='category'),
 #
 # path('articles/create/', ArticleCreate.as_view(), name='articles_create'),
-# path('news/<int:pk>/edit/', PostUpdate.as_view(), name='news_edit'),
+#
 # path('articles/<int:pk>/edit/', PostUpdate.as_view(), name='articles_update'),
 # path('news/<int:pk>/delete/', PostDelete.as_view(), name='news_delete'),
 # path('articles/<int:pk>/delete/', PostDelete.as_view(), name='articles_delete'),

@@ -13,22 +13,26 @@ POST_TYPES = [
     (article, 'Статья'),
 ]
 
-# world_events = 'WE'
-# politics = 'PO'
-# culture = 'CU'
-# economics = 'EC'
-# science = 'SC'
-# sport='SP'
-#
-# CATEGORY_NEWS = [
-#     (world_events, 'мировые события'),
-#     (politics, 'политика'),
-#     (culture, 'культура'),
-#     (economics, 'экономика'),
-#     (science, 'наука'),
-#     (sport, 'спорт')
-#
-# ]
+world_events = 'WE'
+politics = 'PO'
+culture = 'CU'
+economics = 'EC'
+science = 'SC'
+sport='SP'
+weather='WT'
+different='DF'
+
+CATEGORY_NEWS = [
+    (world_events, 'мировые события'),
+    (politics, 'политика'),
+    (culture, 'культура'),
+    (economics, 'экономика'),
+    (science, 'наука'),
+    (sport, 'спорт'),
+    (weather, 'погода'),
+    (different, 'разное'),
+
+]
 
 class Post(models.Model): # статьи и новости, которые создают пользователи
     author = models.ForeignKey('Author', on_delete=models.CASCADE)
@@ -121,17 +125,19 @@ class Author(models.Model):
 
 class Category(models.Model): # Категории новостей/статей
 
-    name = models.CharField(max_length=255, unique=True)  # название категории, уникальное поле
+    #name = models.CharField(max_length=255, unique=True)  # название категории, уникальное поле
+
+    name = models.CharField(max_length=2, choices=CATEGORY_NEWS, unique=True)  # название категории, уникальное поле
     subscribers = models.ManyToManyField(User, through='SubscribersCategory')  # категории публикаций
 
-    #category_new = models.CharField(max_le1ngth=2, choices=CATEGORY_NEWS, unique=True)
+    #category_new = models.CharField(max_length=2, choices=CATEGORY_NEWS, unique=True)
 
 
     def __str__(self):
         return self.name  #return self.name.title()
 
-    #def get_absolute_url(self):
-    #    return reverse('category', kwargs={'cat_id': self.pk})
+    def get_absolute_url(self):
+        return reverse('category', kwargs={'cat_id': self.pk})
 
 
 class PostCategory(models.Model): # Промежуточная модель для связи «многие ко многим»w

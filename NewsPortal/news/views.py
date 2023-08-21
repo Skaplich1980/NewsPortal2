@@ -96,3 +96,14 @@ class NewsCreate(CreateView):
         context['timezones'] = pytz.common_timezones
         return context
 
+class PostEdit(UpdateView):
+    form_class = PostForm
+    model = Post
+    template_name = 'news/post_edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show_title'] = _('Редактирование новости:')
+        context['current_time'] = timezone.localtime(timezone.now())
+        context['timezones'] = pytz.common_timezones
+        return context

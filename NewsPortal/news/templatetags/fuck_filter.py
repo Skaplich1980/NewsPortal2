@@ -5,7 +5,7 @@ from django.template.defaultfilters import stringfilter
 
 register = template.Library()
 
-bad_words = ['охуенный', 'охуенно', 'сука', 'бля', 'блять', 'курва', 'хуй', 'пиздец', 'пизда', 'ебнутый', 'ёбнутый', 'ебанутый', 'fuck', 'damn', 'bitch', 'douchebag', 'asshole', 'poop']
+bad_words = ['заеб', 'охуенный', 'охуенно', 'сука', 'бля', 'блять', 'курва', 'хуй', 'пиздец', 'пизд', 'ебнутый', 'ёбнутый', 'ебанутый', 'fuck', 'damn', 'bitch', 'douchebag', 'asshole', 'poop']
 
 
 def replace(match):

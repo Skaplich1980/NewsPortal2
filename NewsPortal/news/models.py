@@ -13,27 +13,6 @@ POST_TYPES = [
     (article, 'Статья'),
 ]
 
-world_events = 'WE'
-politics = 'PO'
-culture = 'CU'
-economics = 'EC'
-science = 'SC'
-sport='SP'
-weather='WT'
-different='DF'
-
-CATEGORY_NEWS = [
-    (world_events, 'мировые события'),
-    (politics, 'политика'),
-    (culture, 'культура'),
-    (economics, 'экономика'),
-    (science, 'наука'),
-    (sport, 'спорт'),
-    (weather, 'погода'),
-    (different, 'разное'),
-
-]
-
 class Post(models.Model): # статьи и новости, которые создают пользователи
     author = models.ForeignKey('Author', on_delete=models.CASCADE)
     # связь «один ко многим» с моделью Author
@@ -75,7 +54,7 @@ class Post(models.Model): # статьи и новости, которые со�
         return self.text[0:128]+'...'
 
     def __str__(self):
-        return self.header
+        return self.title
 
     def get_absolute_url(self):
         return reverse('post_detail', args=[str(self.id)])
@@ -124,14 +103,8 @@ class Author(models.Model):
         self.save
 
 class Category(models.Model): # Категории новостей/статей
-
-    #name = models.CharField(max_length=255, unique=True)  # название категории, уникальное поле
-
-    name = models.CharField(max_length=2, choices=CATEGORY_NEWS, unique=True)  # название категории, уникальное поле
+    name = models.CharField(max_length=255, unique=True)  # название категории, уникальное поле
     subscribers = models.ManyToManyField(User, through='SubscribersCategory')  # категории публикаций
-
-    #category_new = models.CharField(max_length=2, choices=CATEGORY_NEWS, unique=True)
-
 
     def __str__(self):
         return self.name  #return self.name.title()

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .models import Post
 from .filters import *
@@ -49,6 +50,10 @@ class PostDetail(DetailView):
     template_name = 'news/post.html'
     # Название объекта, в котором будет выбранный пользователем продукт
     context_object_name = 'post'
+
+    #def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
+    #    return get_object_or_404(Post, pk=self.kwargs.get('pk'))
+
 
 def news_search_f(request):
     queryset = Post.objects.all()
@@ -107,3 +112,26 @@ class PostEdit(UpdateView):
         context['current_time'] = timezone.localtime(timezone.now())
         context['timezones'] = pytz.common_timezones
         return context
+
+class ArticleCreate(CreateView):
+    form_class = PostForm
+    model = Post
+    template_name = 'news/post_edit.html'
+
+    def form_valid(self, form):
+        art = form.save(commit=False)
+        art.categoryType = string_article
+        art.author_id = 1
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show_title'] = _('Создание статьи:')
+        context['current_time'] = timezone.localtime(timezone.now())
+        context['timezones'] = pytz.common_timezones
+        return context
+
+class PostDelete(DeleteView):
+    model = Post
+    template_name = 'news/post_delete.html'
+    success_url = reverse_lazy('post_list')

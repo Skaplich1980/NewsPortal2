@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Post
 from .filters import *
 from .forms import *
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
@@ -10,7 +9,17 @@ from django.utils import timezone
 import pytz
 from django.utils.translation import gettext as _
 from django.utils import timezone
-from .models import POST_TYPES, news as string_news, article as string_article
+from .models import Post, POST_TYPES, news as string_news, article as string_article
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth import logout, login
+from django.contrib.auth.decorators import login_required
+#from django.core.cache import cache
+#from .tasks import *
+#from django.views.decorators.cache import cache_page
+#from django.utils.translation import gettext as _
+
+
+
 
 
 
@@ -41,6 +50,10 @@ class PostList(ListView):
         context = super().get_context_data(**kwargs)
         # Добавляем в контекст объект фильтрации.
         context['filterset'] = self.filterset
+        context['current_time'] = timezone.localtime(timezone.now())
+        context['timezones'] = pytz.common_timezones
+        context['cats'] = Category.objects.all()
+        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
         return context
 
 class PostDetail(DetailView):
@@ -51,8 +64,23 @@ class PostDetail(DetailView):
     # Название объекта, в котором будет выбранный пользователем продукт
     context_object_name = 'post'
 
-    #def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
-    #    return get_object_or_404(Post, pk=self.kwargs.get('pk'))
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cat'] = dict(POST_TYPES)[self.object.categoryType]
+        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+        context['cats'] = Category.objects.all()
+        context['current_time'] = timezone.localtime(timezone.now())
+        context['timezones'] = pytz.common_timezones
+        return context
+
+    # def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
+    #     obj = cache.get(f'product-{self.kwargs["pk"]}',
+    #                     None)  # кэш очень похож на словарь, и метод get действует так же. Он забирает значение по ключу, если его нет, то забирает None.
+    #     # если объекта нет в кэше, то получаем его и записываем в кэш
+    #     if not obj:
+    #         obj = super().get_object(queryset=self.queryset)
+    #         cache.set(f'product-{self.kwargs["pk"]}', obj)
+    #     return obj
 
 
 def news_search_f(request):
@@ -72,14 +100,15 @@ def news_search_f(request):
         'filterset': filterset,
         'page_obj': filter_qs,
         'paginator': paginator,
-        #'cats': Category.objects.all(),
-        #'current_time': timezone.localtime(timezone.now()),
-        #'timezones': pytz.common_timezones
+        'cats': Category.objects.all(),
+        'current_time': timezone.localtime(timezone.now()),
+        'timezones': pytz.common_timezones
     }
 
     return render(request, 'news/search.html', context=context)
 
-class NewsCreate(CreateView):
+class NewsCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post',)
     # Указываем нашу разработанную форму
     form_class = PostForm
     # модель товаров
@@ -90,8 +119,8 @@ class NewsCreate(CreateView):
     def form_valid(self, form):
         news = form.save(commit=False)
         news.categoryType = string_news
-        #author = Author.objects.get(user_id=self.request.user)  # берем автора новости, который зашел в систему
-        news.author_id = 1
+        author = Author.objects.get(user_id=self.request.user)  # берем автора новости, который зашел в систему
+        news.author_id = author
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -101,7 +130,8 @@ class NewsCreate(CreateView):
         context['timezones'] = pytz.common_timezones
         return context
 
-class PostEdit(UpdateView):
+class PostEdit(PermissionRequiredMixin, UpdateView):
+    permission_required = ('news.change_post',)
     form_class = PostForm
     model = Post
     template_name = 'news/post_edit.html'
@@ -113,7 +143,8 @@ class PostEdit(UpdateView):
         context['timezones'] = pytz.common_timezones
         return context
 
-class ArticleCreate(CreateView):
+class ArticleCreate(PermissionRequiredMixin, CreateView):
+    permission_required = ('news.add_post',)
     form_class = PostForm
     model = Post
     template_name = 'news/post_edit.html'
@@ -121,7 +152,8 @@ class ArticleCreate(CreateView):
     def form_valid(self, form):
         art = form.save(commit=False)
         art.categoryType = string_article
-        art.author_id = 1
+        author = Author.objects.get(user_id=self.request.user)  # берем автора новости, который зашел в систему
+        art.author_id = author
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -131,7 +163,50 @@ class ArticleCreate(CreateView):
         context['timezones'] = pytz.common_timezones
         return context
 
-class PostDelete(DeleteView):
+class PostDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('news.delete_post',)
     model = Post
     template_name = 'news/post_delete.html'
     success_url = reverse_lazy('post_list')
+
+class UserDataUpdate(LoginRequiredMixin, UpdateView):
+    form_class = UserDataForm
+    model = User
+    template_name = 'account/user_edit.html'
+    success_url = reverse_lazy('post_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = _('Редактирование данных пользователя:')
+        context['current_time'] = timezone.localtime(timezone.now())
+        context['timezones'] = pytz.common_timezones
+        return context
+
+    def get_object(self):
+        return self.request.user
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('login')
+
+class BaseRegisterView(CreateView):
+    model = User
+    form_class = BaseRegisterForm
+    success_url = reverse_lazy('post_list')
+    template_name = 'account/user_edit.html'
+
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect('post_list')
+
+
+@login_required
+def upgrade_me(request):
+    user = request.user
+    premium_group = Group.objects.get(name='authors')
+    if not request.user.groups.filter(name='authors').exists():
+        premium_group.user_set.add(user)
+        Author.objects.create(user_id=user)
+    return redirect('post_list')

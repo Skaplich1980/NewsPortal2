@@ -29,4 +29,5 @@ urlpatterns = [
     path('contacts/', views.contacts, name='contact'),
     #path('', views.index, name='index'),
     path('', include('news.urls')),
+    path('accounts/', include('allauth.urls')),
 ]

@@ -157,3 +157,5 @@ ACCOUNT_EMAIL_VRIFICATION = 'mandatory'
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale')
 ]
+
+ACCOUNT_EMAIL_VERIFICATION = 'none'

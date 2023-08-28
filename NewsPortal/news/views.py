@@ -13,6 +13,7 @@ from .models import Post, POST_TYPES, news as string_news, article as string_art
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 #from django.core.cache import cache
 #from .tasks import *
 #from django.views.decorators.cache import cache_page
@@ -54,6 +55,7 @@ class PostList(ListView):
         context['timezones'] = pytz.common_timezones
         context['cats'] = Category.objects.all()
         context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+        context['username'] = self.request.user.username
         return context
 
 class PostDetail(DetailView):
@@ -205,8 +207,8 @@ class BaseRegisterView(CreateView):
 @login_required
 def upgrade_me(request):
     user = request.user
-    premium_group = Group.objects.get(name='authors')
+    authors_group = Group.objects.get(name='authors')
     if not request.user.groups.filter(name='authors').exists():
-        premium_group.user_set.add(user)
-        Author.objects.create(user_id=user)
+        authors_group.user_set.add(user)
+        #Author.objects.create(user_id=user)
     return redirect('post_list')

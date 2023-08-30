@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
+from django.views import View
+from django.core.mail import send_mail
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .filters import *
 from .forms import *
@@ -56,6 +58,9 @@ class PostList(ListView):
         context['cats'] = Category.objects.all()
         context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
         context['username'] = self.request.user.username
+        context['pcats'] = Category.objects.prefetch_related('name').all()
+
+
         return context
 
 class PostDetail(DetailView):

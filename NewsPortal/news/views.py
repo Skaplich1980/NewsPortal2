@@ -107,12 +107,17 @@ def news_search_f(request):
     except EmptyPage:
         filter_qs = paginator.get_page(paginator.num_pages)
 
+    t_list = {}  # получение списка категорий новостей
+    for q in filterset.qs:
+        t_list[q.id] = list(q.categories.values_list('name'))
+
     context = {
         'posts': filter_qs,
         'filterset': filterset,
         'page_obj': filter_qs,
         'paginator': paginator,
         'cats': Category.objects.all(),
+        'fcats': t_list,
         'current_time': timezone.localtime(timezone.now()),
         'timezones': pytz.common_timezones
     }

@@ -18,7 +18,7 @@ class PostForm(forms.ModelForm):
           # 'author', автоматически
            'title',
           # 'date_create',автоматически
-           'postCategory',
+           'categories',
            'text'
        ]
        labels = {

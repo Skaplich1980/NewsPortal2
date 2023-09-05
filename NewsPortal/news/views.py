@@ -16,14 +16,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.core.mail import EmailMultiAlternatives  # импортируем класс для создание объекта письма с html
+from django.template.loader import render_to_string
 #from django.core.cache import cache
 #from .tasks import *
 #from django.views.decorators.cache import cache_page
 #from django.utils.translation import gettext as _
-
-
-
-
 
 
 paginator_count = 10 # вынесли константу для использования в нескольких местах кода
@@ -56,9 +54,16 @@ class PostList(ListView):
         context['current_time'] = timezone.localtime(timezone.now())
         context['timezones'] = pytz.common_timezones
         context['cats'] = Category.objects.all()
+
+        t_list = {} # получение списка категорий новостей
+        for q in self.filterset.qs:
+            t_list[q.id] = list(q.categories.values_list('name'))
+        print(t_list)
+        context['fcats'] = t_list
+
         context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
         context['username'] = self.request.user.username
-        context['pcats'] = Category.objects.prefetch_related('name').all()
+        context['pcats'] = Post.objects.select_related('postCategory')
 
 
         return context
@@ -136,6 +141,8 @@ class NewsCreate(PermissionRequiredMixin, CreateView):
         context['current_time'] = timezone.localtime(timezone.now())
         context['timezones'] = pytz.common_timezones
         return context
+
+
 
 class PostEdit(PermissionRequiredMixin, UpdateView):
     permission_required = ('news.change_post',)
@@ -217,3 +224,34 @@ def upgrade_me(request):
         authors_group.user_set.add(user)
         #Author.objects.create(user_id=user)
     return redirect('post_list')
+
+@login_required
+def subscribe_on_cat(request, cat_id):
+    user = request.user
+    cat = Category.objects.get(id=cat_id)
+    cat.subscribers.add(user)
+    return redirect('category', cat_id=cat_id)
+
+@login_required
+def unsubscribe_cat(request, cat_id):
+    user = request.user
+    cat = Category.objects.get(id=cat_id)
+    cat.subscribers.remove(user)
+    return redirect('category', cat_id=cat_id)
+
+def show_category(request, cat_id):
+    posts = Post.objects.filter(PostCategory__id=cat_id).order_by('-date_create')
+    cats = Category.objects.all()
+    try:
+        already_subscribed = SubscribersCategory.objects.get(user_id=request.user.pk, category_id=cat_id)
+    except SubscribersCategory.DoesNotExist:
+        already_subscribed = None
+    context = {
+        'posts': posts,
+        'cats': cats,
+        'current_cat': Category.objects.get(id=cat_id),
+        'already_subscribed': already_subscribed,
+    }
+
+    return render(request, 'news/posts.html', context=context)
+

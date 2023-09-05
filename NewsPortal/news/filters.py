@@ -3,6 +3,7 @@ from django.forms import DateInput
 from django_filters import FilterSet, filters
 from .models import *
 
+
 class NewsFilter(FilterSet):
     row_date = django_filters.DateFilter(
         field_name='date_create',
@@ -12,7 +13,12 @@ class NewsFilter(FilterSet):
     )
     title = django_filters.CharFilter(lookup_expr='icontains', label='Заголовок')
     text = django_filters.CharFilter(lookup_expr='icontains', label='Текст публикации')
+    categoryType = django_filters.CharFilter(lookup_expr='exact', label='Тип (NS - новость, AR - статья)')
+
+    # postCategory = django_filters.CharFilter(lookup_expr='icontains', label='Категория')
 
     class Meta:
         model = Post
-        fields = ['title', 'text']
+        fields = ['title', 'text', 'categoryType'
+                  # 'postCategory'
+                  ]

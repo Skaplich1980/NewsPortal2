@@ -23,4 +23,8 @@ urlpatterns = [
    path('news/<int:pk>/delete/', PostDelete.as_view(), name='news_delete'),
    path('articles/<int:pk>/delete/', PostDelete.as_view(), name='articles_delete'),
    path('user/upgrade/', upgrade_me, name='upgrade_user'),
+   path('category/<int:cat_id>/subscribe', subscribe_on_cat, name='subscribe'),
+   path('category/<int:cat_id>/unsubscribe', unsubscribe_cat, name='unsubscribe'),
+   path('category/<int:cat_id>/', show_category, name='category'),
+
 ]

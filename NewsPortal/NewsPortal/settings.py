@@ -26,7 +26,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(_i!nphtl@y!b(a15xj%h5ye!d9&1a-@pb@a+5cft61=3mx$5r'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -154,14 +154,16 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-ACCOUNT_EMAIL_VRIFICATION = 'mandatory'
+EMAIL_USE_SSL = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+#ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale')
 ]
-
-ACCOUNT_EMAIL_VERIFICATION = 'none'

@@ -167,8 +167,11 @@ EMAIL_USE_TLS = False
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 #DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + os.getenv("EMAIL_DOMAIN")
 
-# формат даты, которую будет воспринимать наш задачник
-#APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+# формат даты, которую будет воспринимать наш задачник (вспоминаем модуль по фильтрам)
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+
+# если задача не выполняется за 25 секунд, то она автоматически снимается, можете поставить время побольше, но как правило, это сильно бьёт по производительности сервера
+APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
 
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale')

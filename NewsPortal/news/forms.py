@@ -23,7 +23,7 @@ class PostForm(forms.ModelForm):
        ]
        labels = {
            'title':'Заголовок',
-           'postCategory':'Категория',
+           'categories':'Категория',
            'text':'текст публикации',
        }
 

@@ -23,8 +23,11 @@ urlpatterns = [
    path('news/<int:pk>/delete/', PostDelete.as_view(), name='news_delete'),
    path('articles/<int:pk>/delete/', PostDelete.as_view(), name='articles_delete'),
    path('user/upgrade/', upgrade_me, name='upgrade_user'),
+   path('user/', include('allauth.urls')),
+   path('user/edit/', UserDataUpdate.as_view(), name='user_edit'),
    path('category/<int:cat_id>/subscribe', subscribe_on_cat, name='subscribe'),
    path('category/<int:cat_id>/unsubscribe', unsubscribe_cat, name='unsubscribe'),
    path('category/<int:cat_id>/', show_category, name='category'),
+   #path('news/limit/', news_limit, name='news_limit'),
 
 ]

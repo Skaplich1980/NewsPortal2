@@ -15,10 +15,11 @@ class NewsFilter(FilterSet):
     text = django_filters.CharFilter(lookup_expr='icontains', label='Текст публикации')
     categoryType = django_filters.CharFilter(lookup_expr='exact', label='Тип (NS - новость, AR - статья)')
 
-    # postCategory = django_filters.CharFilter(lookup_expr='icontains', label='Категория')
+    categories = django_filters.CharFilter(lookup_expr='icontains', label='Категория')
 
-    class Meta:
-        model = Post
-        fields = ['title', 'text', 'categoryType'
-                  # 'postCategory'
-                  ]
+
+class Meta:
+    model = Post
+    fields = ['title', 'text', 'categoryType',
+              'categories',
+              ]

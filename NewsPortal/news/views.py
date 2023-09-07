@@ -23,6 +23,8 @@ from django.template.loader import render_to_string
 #from django.views.decorators.cache import cache_page
 #from django.utils.translation import gettext as _
 
+from django.core.management.utils import get_random_secret_key
+
 
 paginator_count = 10 # вынесли константу для использования в нескольких местах кода
 # кол-во отображаемых на страніце новостей
@@ -54,18 +56,16 @@ class PostList(ListView):
         context['current_time'] = timezone.localtime(timezone.now())
         context['timezones'] = pytz.common_timezones
         context['cats'] = Category.objects.all()
+        print(context['cats'])
 
         t_list = {} # получение списка категорий новостей
         for q in self.filterset.qs:
             t_list[q.id] = list(q.categories.values_list('name'))
-        print(t_list)
         context['fcats'] = t_list
 
         context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
         context['username'] = self.request.user.username
-        context['pcats'] = Post.objects.select_related('postCategory')
-
-
+        context['pcats'] = Post.objects.select_related('PostCategory')
         return context
 
 class PostDetail(DetailView):
@@ -136,8 +136,8 @@ class NewsCreate(PermissionRequiredMixin, CreateView):
     def form_valid(self, form):
         news = form.save(commit=False)
         news.categoryType = string_news
-        author = Author.objects.get(user_id=self.request.user)  # берем автора новости, который зашел в систему
-        news.author_id = author
+        author1 = Author.objects.get(Author_User=self.request.user)  # берем автора новости, который зашел в систему
+        news.author = author1
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -171,8 +171,8 @@ class ArticleCreate(PermissionRequiredMixin, CreateView):
     def form_valid(self, form):
         art = form.save(commit=False)
         art.categoryType = string_article
-        author = Author.objects.get(user_id=self.request.user)  # берем автора новости, который зашел в систему
-        art.author_id = author
+        author1 = Author.objects.get(Author_User=self.request.user)  # берем автора новости, который зашел в систему
+        news.author = author1
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -227,7 +227,7 @@ def upgrade_me(request):
     authors_group = Group.objects.get(name='authors')
     if not request.user.groups.filter(name='authors').exists():
         authors_group.user_set.add(user)
-        #Author.objects.create(user_id=user)
+    Author.objects.create(Author_User=user)
     return redirect('post_list')
 
 @login_required
@@ -245,18 +245,29 @@ def unsubscribe_cat(request, cat_id):
     return redirect('category', cat_id=cat_id)
 
 def show_category(request, cat_id):
-    posts = Post.objects.filter(PostCategory__id=cat_id).order_by('-date_create')
+    posts = Post.objects.filter(categories__id=cat_id).order_by('-date_create')
     cats = Category.objects.all()
     try:
         already_subscribed = SubscribersCategory.objects.get(user_id=request.user.pk, category_id=cat_id)
     except SubscribersCategory.DoesNotExist:
         already_subscribed = None
+
+    queryset = Post.objects.all()
+    filterset = NewsFilter(request.GET, queryset)
+    t_list = {}  # получение списка категорий новостей
+
+    for q in filterset.qs:
+        t_list[q.id] = list(q.categories.values_list('name'))
     context = {
         'posts': posts,
         'cats': cats,
+        'fcats': t_list,
         'current_cat': Category.objects.get(id=cat_id),
         'already_subscribed': already_subscribed,
     }
-
+    print(get_random_secret_key())
     return render(request, 'news/posts.html', context=context)
+
+#def news_limit(request):
+#    return render(request, 'news/post_limit.html')
 

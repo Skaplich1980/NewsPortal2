@@ -45,13 +45,14 @@ INSTALLED_APPS = [
     #'django.contrib.flatpages',
     'django.contrib.sites',
 
-    'news',
     'accounts',
     'django_filters',
     'allauth',
+    'news.apps.NewsConfig',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'django_apscheduler',
 ]
 
 MIDDLEWARE = [
@@ -161,8 +162,13 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 EMAIL_USE_SSL = True
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-#ACCOUNT_EMAIL_VERIFICATION = 'none'
+EMAIL_USE_TLS = False
+#ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # регистрация с подтверждением электронной почты и вход пользователя с подтверждением
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + os.getenv("EMAIL_DOMAIN")
+
+# формат даты, которую будет воспринимать наш задачник
+#APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale')

@@ -157,15 +157,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  # пароль от почты
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
 #ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # регистрация с подтверждением электронной почты и вход пользователя с подтверждением
+#ACCOUNT_EMAIL_VERIFICATION = 'optional'  # опционально выбор
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-#DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + os.getenv("EMAIL_DOMAIN")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER + os.getenv("EMAIL_DOMAIN")
 
 # формат даты, которую будет воспринимать наш задачник (вспоминаем модуль по фильтрам)
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
@@ -176,3 +180,9 @@ APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
 LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale')
 ]
+
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

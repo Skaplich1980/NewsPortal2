@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views import View
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from .filters import *
@@ -136,8 +137,14 @@ class NewsCreate(PermissionRequiredMixin, CreateView):
     def form_valid(self, form):
         news = form.save(commit=False)
         news.categoryType = string_news
-        author1 = Author.objects.get(Author_User=self.request.user)  # берем автора новости, который зашел в систему
-        news.author = author1
+        try:
+            author1 = Author.objects.get(Author_User=self.request.user)  # берем автора новости, который зашел в систему
+            news.author = author1
+        except ObjectDoesNotExist: # если пользователь не является автором, то добавляем его в авторы
+            author1=Author()
+            author1.Author_User=self.request.user
+            author1.save()
+            news.author = author1
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -169,10 +176,16 @@ class ArticleCreate(PermissionRequiredMixin, CreateView):
     template_name = 'news/post_edit.html'
 
     def form_valid(self, form):
-        art = form.save(commit=False)
-        art.categoryType = string_article
-        author1 = Author.objects.get(Author_User=self.request.user)  # берем автора новости, который зашел в систему
-        news.author = author1
+        news = form.save(commit=False)
+        news.categoryType = string_news
+        try:
+            author1 = Author.objects.get(Author_User=self.request.user)  # берем автора новости, который зашел в систему
+            news.author = author1
+        except ObjectDoesNotExist:  # если пользователь не является автором, то добавляем его в авторы
+            author1 = Author()
+            author1.Author_User = self.request.user
+            author1.save()
+            news.author = author1
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):

@@ -28,10 +28,11 @@ def day_news_limit(sender, instance, **kwargs):
     #user1 = instance.author.Author_User
     #author1 = Author.objects.get(Author_User=user1)
     today = timezone.now().date()
-    count = Post.objects.filter(author=instance.author, date_create=today).count()
+    day1 = datetime.today() - timedelta(days=1)
+    count = Post.objects.filter(author=instance.author, date_create__gte=day1).count()
     if count>=3:
         text = 'Больше трех статей в сутки создавать одному автору запрещено!'
-        return render(request, 'user/post_limit.html', {'text': text})
+        return render(request, 'news/post_limit.html', {'text': text})
 
 
 # приветственное письмо пользователю при регистрации в приложении

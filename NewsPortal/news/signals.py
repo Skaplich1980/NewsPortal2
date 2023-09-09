@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.utils import timezone
 from requests import request
-
+from datetime import datetime, timedelta
 from .models import *
 from .tasks import *
 from allauth.account.signals import user_signed_up
@@ -27,8 +27,8 @@ def send_mail_on_post(sender, action, instance, **kwargs):
 def day_news_limit(sender, instance, **kwargs):
     #user1 = instance.author.Author_User
     #author1 = Author.objects.get(Author_User=user1)
-    today = timezone.now().date()
-    day1 = datetime.today() - timedelta(days=1)
+    today = timezone.now()
+    day1 = today - timedelta(days=1)
     count = Post.objects.filter(author=instance.author, date_create__gte=day1).count()
     if count>=3:
         text = 'Больше трех статей в сутки создавать одному автору запрещено!'

@@ -17,7 +17,7 @@ def task_mail_on_post(post_id, user_id):  # задача выслать элек
     user = User.objects.get(pk=user_id)
     path = post.get_absolute_url()
     html_content = render_to_string(
-        'mail/new_post.html',
+        'email/new_post.html',
         {
             'username': user.username,  # получение имени пользователя
             'message': post.text[:50] + '...',  # 50 символов текста статьи
@@ -51,7 +51,7 @@ def task_mail_week(post_id, user_id):  # задача выслать элект�
             for u1 in users:  # бежим по выбранным пользователям
                 p = c.get_absolute_url()  # формирование ссылки
                 html_content = render_to_string( # формирование тела письма в html формате
-                    'mail/post_week.html',
+                    'email/post_week.html',
                     {
                         'username': u1.username,  # получение имени пользователя
                         'cat_name': c.name,

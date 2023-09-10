@@ -26,7 +26,7 @@ def task_mail_on_post(post_id, user_id):  # задача выслать элек
     )
     # формирование письма
     msg = EmailMultiAlternatives(
-        subject=f'{post.header}',  # тема письма
+        subject=f'{post.title}',  # тема письма
         body=post.text[:50] + '...',  # тело
         from_email=settings.DEFAULT_FROM_EMAIL,
         to=[user.email],  # это то же, что и recipients_list

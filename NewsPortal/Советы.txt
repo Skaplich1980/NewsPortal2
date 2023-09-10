@@ -1,0 +1,53 @@
+¬ы можете это сделать в цикле:
+¬ам нужно создать еще один столбец в таблице и в качестве значени€ указывать как раз этот код. ќн выведет список категорий
+{% for category in post.postCategory.all() %}
+    {{category}}
+{% endfor %}
+
+¬ Django не получитс€ сделать именно left join. ќднако в данном случае INNER JOIN будет достаточно. 
+
+
+
+
+Post.objects.select_related('postCategory')
+
+
+<td align="left ">{{fcats|hash:p.id}}</td>
+
+
+
+https://stackoverflow.com/questions/1275735/how-to-access-a-dictionary-element-in-a-django-template
+
+
+{% for key, c in fcats|hash:p.id %}
+ {{key}} - {{c}}
+{% endfor %}
+
+
+{% for o in objects %}
+  <li>{{ dictionary|hash:o.id }}</li>
+{% endfor %}
+
+
+<ul>
+{% for key, value in choices.items %} 
+  <li>{{key}} - {{value}}</li>
+ {% endfor %}
+</ul>
+
+<td>
+{% for key, с in (fcats|hash:p.id).items %} 
+  <li>{{key}} - {{с}}</li>
+ {% endfor %}
+</td>
+
+
+<ul>
+{% for choice in choices.items %} 
+  <li>{{choice.0}} - {{choice.1}}</li>
+{% endfor %}
+</ul>
+
+
+https://overcoder.net/q/709/как-получить-доступ-к-элементу-словар€-в-шаблоне-django
+

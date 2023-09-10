@@ -1,0 +1,12 @@
+{% extends "default.html" %}
+{% load i18n %}
+
+{% block content %}
+<h2> {% trans "Выход из системы" %} </h2>
+<hr>
+<form action="" method="post">
+    {% csrf_token %}
+    <p>{% trans "Вы действительно хотите выйти?" %}</p>
+    <input type="submit" value="{% trans "Выйти" %}" />
+</form>
+{% endblock %}

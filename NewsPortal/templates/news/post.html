@@ -1,0 +1,51 @@
+<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'default.html' %}
+{% load custom_filters %}
+{% load custom_tags %}
+
+
+<!-- Название у нас будет Post -->
+{% block title %}
+post
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим новость, идентификатор которого был передан в url -->
+{% block content %}
+<h1>новость, пост</h1>
+{% if post %}
+        <tbody>
+            <tr>
+                <td>
+                    <small> Заголовок: </small>
+                    <p>{{ post.title | censor }}</p>
+                </td>
+                <td>
+                    <small> Дата и время публикации: </small>
+                    <p>{{ post.date_create |date:'d.m.Y / H:i'}}</p>
+                </td>
+                <td>
+                    <small> шапка новости: </small>
+                    <p>{{ post.title | censor }}</p>
+                </td>
+
+                <td>
+                    <small> Автор: </small>
+                    <p>{{ post.author_id.user_id.username}}</p>
+                </td>
+                <td>
+                    <small> Рейтинг: </small>
+                    <p>{{ post.rating }}</p>
+                </td>
+
+                <td>
+                    <small> текст новости: </small>
+                    <p><i>{{ post.text | censor}}</i></p>
+                </td>
+
+            </tr>
+        </tbody>
+
+{% else %}
+       <h2>Новости нет!</h2>
+{% endif %}
+{% endblock content %}

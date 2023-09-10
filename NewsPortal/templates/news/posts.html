@@ -1,0 +1,113 @@
+<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'default.html' %}
+{% load custom_filters %}
+{% load custom_tags %}
+{% load i18n %}
+
+<!-- Название у нас будет Post -->
+{% block title %}
+posts
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим все новости -->
+{% block content %}
+  {% if user.is_authenticated %}
+    {% if is_not_author %}
+        Не автор не может добавлять посты
+    {% else %}
+     <button> <a class="nav-link" href="/news/create/">Добавить новость</a> </button>
+     <button> <a class="nav-link" href="/articles/create/">Добавить статью</a> </button>
+    {% endif %}
+  {% else %}
+    Неавторизованный пользователь не может добавлять посты
+  {% endif %}
+
+  {% if user.is_authenticated %}
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                {% if is_not_author %}
+                    <button> <a href="{% url 'upgrade_user' %}"> "Cтать автором!" </a> </button>
+                {% endif %}
+            </div>
+        </div>
+  {% endif %}
+
+  {% if current_cat %}
+        {% if user.is_authenticated %}
+            <h1>Категория: {{ current_cat.name }}</h1>
+            {% if already_subscribed %}
+                <button> <a href="{% url 'unsubscribe' current_cat.pk %}"> Отписаться от обновлений. </a> </button>
+            {% else %}
+                <button> <a href="{% url 'subscribe' current_cat.pk %}"> Подписаться на обновления! </a> </button>
+            {% endif %}
+        {% else %}
+            <h1>Категория: {{ current_cat.name }}</h1>
+        {% endif %}
+    {% else %}
+       <h1>Все новости - {{ posts |length }} </h1>
+  {% endif %}
+
+
+
+{% block search %}
+{% endblock search %}
+
+
+
+{% if posts %}
+       <table class="table table-striped">
+           <tr>
+               <td><b>Заголовок</b></td>
+               <td><b>Дата публикации</b></td>
+               <td><b>Категория</b></td>
+               <td><b>Автор</b></td>
+               <td><b>Текст статьи</b></td>
+               <td><b>Рейтинг</b></td>
+           </tr>
+           {% for p in posts %}
+           <tr>
+               <!-- Не забываем, что переменные в шаблоне ничем не отличаются
+                от переменных в Python. Здесь также можно получать доступ к
+                полям объекта модели. Например, здесь мы выводим имя,
+                в следующем столбце описание, и т.д.  -->
+               <td align="left "><a href="{% url 'post_detail' p.pk %}">{{ p.title | censor}}</a></td>
+               <td align="left ">{{ p.date_create}} </td>
+               <td align="left ">{{fcats|hash:p.id}}</td>
+               <td align="left ">{{ p.author_id.user_id.username}} </td>
+               <td align="left ">{{ p.text | truncatewords:25 | censor}}</td>
+               <td align="left ">{{ p.rating }}</td>
+           </tr>
+           {% endfor %}
+
+
+       </table>
+   {% else %}
+       <!-- Если новостей нет, говорим, что нет ;) -->
+       <h2>Новостей нет!</h2>
+   {% endif %}
+
+{# Добавляем пагинацию на страницу #}
+
+   {# Информация о предыдущих страницах #}
+   {% if page_obj.has_previous %}
+       <a href="?page=1">1</a>
+       {% if page_obj.previous_page_number != 1 %}
+           ...
+           <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {# Информация о текущей странице #}
+   {{ page_obj.number }}
+
+   {# Информация о следующих страницах #}
+   {% if page_obj.has_next %}
+       <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>
+       {% if paginator.num_pages != page_obj.next_page_number %}
+           ...
+           <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+       {% endif %}
+   {% endif %}
+
+
+{% endblock content %}

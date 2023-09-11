@@ -1,6 +1,7 @@
 from django.urls import path, include
 # Импортируем созданное нами представление
 from .views import *
+from django.views.decorators.cache import cache_page
 
 
 urlpatterns = [
@@ -10,10 +11,12 @@ urlpatterns = [
    # Т.к. наше объявленное представление является классом,
    # а Django ожидает функцию, нам надо представить этот класс в виде view.
    # Для этого вызываем метод as_view.
-   path('', PostList.as_view(), name='post_list'),
+   # path('', PostList.as_view(), name='post_list'),
+   path('', cache_page(60)(PostList.as_view()), name='post_list'),
    # pk — это первичный ключ новости, который будет выводиться у нас в шаблон
    # int — указывает на то, что принимаются только целочисленные значения
    path('news/<int:pk>/', PostDetail.as_view(), name='post_detail'),
+   #path('news/<int:pk>/', cache_page(5*60)(PostDetail.as_view()), name='post_detail'),
    #path('pages/', include('django.contrib.flatpages.urls')),
    path('news/search/', news_search_f, name='news_search'), # поиск новостей
    path('news/create/', NewsCreate.as_view(), name='news_create'),

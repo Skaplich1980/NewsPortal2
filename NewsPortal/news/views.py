@@ -154,7 +154,7 @@ class NewsCreate(PermissionRequiredMixin, CreateView):
         count = Post.objects.filter(author=news.author, date_create__gte=day1).count()
         if count >= 3:
             text = 'Больше трех статей в сутки создавать одному автору запрещено!'
-            return render(request, 'news/post_limit.html', {'text': text})
+            return render(self.request, 'news/post_limit.html', {'text': text})
 
         return super().form_valid(form)
 

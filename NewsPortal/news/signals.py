@@ -11,25 +11,25 @@ from django.dispatch import receiver
 from django.core.mail import send_mail, EmailMultiAlternatives
 
 # если произошло добавление новости, то подписанным пользователям отправляем письма
-# @receiver(m2m_changed, sender=Post.categories.through)
-# # m2m_changed возникает при изменении ManyToManyField модели.
-# def send_mail_on_post(sender, action, instance, **kwargs):
-#     # отправляем письмо
-#     if action == 'post_add':  # если событие добавление поста
-#         cats = instance.categories.all()  # берем все категории
-#         for c in cats:  # цикл по всем категориям
-#             users = c.subscribers.all()  # бежим по связям, пользователей, которые подписаны на категории новостей, собираем этих пользователей
-#             for u in users:
-#                 task_mail_on_post.delay(instance.pk, u.pk)  # рассылка писем
+@receiver(m2m_changed, sender=Post.categories.through)
+# m2m_changed возникает при изменении ManyToManyField модели.
+def send_mail_on_post(sender, action, instance, **kwargs):
+    # отправляем письмо
+    if action == 'post_add':  # если событие добавление поста
+        cats = instance.categories.all()  # берем все категории
+        for c in cats:  # цикл по всем категориям
+            users = c.subscribers.all()  # бежим по связям, пользователей, которые подписаны на категории новостей, собираем этих пользователей
+            for u in users:
+                task_mail_on_post.delay(instance.pk, u.pk)  # рассылка писем
 
-# если произошло добавление новости, то подписанным пользователям отправляем письма
-@receiver(post_save, sender=Post)
-def send_mail_on_post(sender, instance, **kwargs):
-    cats = instance.categories.all()  # берем все категории
-    for c in cats:  # цикл по всем категориям
-        users = c.subscribers.all()  # бежим по связям, пользователей, которые подписаны на категории новостей, собираем этих пользователей
-        for u in users:
-            task_mail_on_post.delay(instance.pk, u.pk)  # рассылка писем
+# # если произошло добавление новости, то подписанным пользователям отправляем письма
+# @receiver(post_save, sender=Post)
+# def send_mail_on_post(sender, instance, **kwargs):
+#     cats = instance.categories.all() # берем все категории
+#     for c in cats:  # цикл по всем категориям
+#         users = c.subscribers.all()  # бежим по связям, пользователей, которые подписаны на категории новостей, собираем этих пользователей
+#         for u in users:
+#             task_mail_on_post.delay(instance.pk, u.pk)  # рассылка писем
 
 # Больше трех статей в сутки создавать одному автору запрещено
 # @receiver(pre_save, sender=Post)
@@ -41,7 +41,7 @@ def send_mail_on_post(sender, instance, **kwargs):
 #     count = Post.objects.filter(author=instance.author, date_create__gte=day1).count()
 #     if count>=3:
 #         text = 'Больше трех статей в сутки создавать одному автору запрещено!'
-        return render(request, 'news/post_limit.html', {'text': text})
+#         return render(request, 'news/post_limit.html', {'text': text})
 
 
 # приветственное письмо пользователю при регистрации в приложении

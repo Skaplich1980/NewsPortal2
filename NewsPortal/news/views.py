@@ -26,9 +26,10 @@ from django.template.loader import render_to_string
 #from .tasks import *
 #from django.views.decorators.cache import cache_page
 #from django.utils.translation import gettext as _
-
+import logging
 from django.core.management.utils import get_random_secret_key
 
+logger = logging.getLogger(__name__)
 
 paginator_count = 10 # вынесли константу для использования в нескольких местах кода
 # кол-во отображаемых на страніце новостей
@@ -56,6 +57,8 @@ class PostList(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Добавляем в контекст объект фильтрации.
+
+        logger.info("Проверка логгирования")
         context['filterset'] = self.filterset
         context['current_time'] = timezone.localtime(timezone.now())
         context['timezones'] = pytz.common_timezones
@@ -89,14 +92,14 @@ class PostDetail(DetailView):
         context['timezones'] = pytz.common_timezones
         return context
 
-    def  get_object(self, *args, **kwargs): # переопределяем метод получения объекта, как ни странно
-        obj = cache.get(f'post-{self.kwargs["pk"]}',None)
-        # кэш очень похож на словарь, и метод get действует так же. Он забирает значение по ключу, если его нет, то забирает None.
-        # если объекта нет в кэше, то получаем его и записываем в кэш
-        if not obj:
-            obj = super().get_object(queryset=self.queryset)
-            cache.set(f'post-{self.kwargs["pk"]}', obj)
-        return obj
+    # def  get_object(self, *args, **kwargs): # переопределяем метод получения объекта, как ни странно
+    #     obj = cache.get(f'post-{self.kwargs["pk"]}',None)
+    #     # кэш очень похож на словарь, и метод get действует так же. Он забирает значение по ключу, если его нет, то забирает None.
+    #     # если объекта нет в кэше, то получаем его и записываем в кэш
+    #     if not obj:
+    #         obj = super().get_object(queryset=self.queryset)
+    #         cache.set(f'post-{self.kwargs["pk"]}', obj)
+    #     return obj
 
 
 def news_search_f(request):

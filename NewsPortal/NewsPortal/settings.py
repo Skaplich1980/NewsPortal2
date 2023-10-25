@@ -58,6 +58,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -128,7 +129,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+#LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
+
 
 TIME_ZONE = 'UTC'
 
@@ -195,3 +198,121 @@ CACHES = {
         'TIMEOUT': 300,
     }
 }
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+            'format_console_d':{
+                'format':'{asctime} {levelname} {message}',
+                'style': '{',
+            },
+            'format_console_w': {
+                'format':'{asctime} {levelname} {message} {pathname}',
+                'style': '{',
+            },
+            'format_console_e': {
+                'format':'{asctime} {levelname} {message} {pathname} {excinfo}',
+                'style': '{',
+            },
+	        'format_general': {
+                'format':'{asctime} {levelname} {module} {message}',
+                'style': '{',
+            },
+	        'format_errors':  {
+                'format':'{asctime} {levelname} {message} {pathname} {excinfo}',
+                'style': '{',
+            },
+	        'format_security':{
+                'format':'{asctime} {levelname} {message} {module}',
+                'style': '{',
+            },
+            'format_mail':    {
+                'format':'{asctime} {levelname} {message} {pathname}',
+                'style': '{',
+            }
+    },
+
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+
+    'handlers': {
+        'console_D': {
+	        'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'format_console_d'
+	    },
+        'console_W': {
+	        'level': 'WARNING',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'format_console_w'
+        },
+	    'console_E': {
+	        'level': 'ERROR',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'format_console_e'
+	    },
+        'general': {
+ 	        'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'formatter': 'format_general',
+	    'filename': 'general.log'
+        },
+        'errors': {
+	        'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'formatter': 'format_errors',
+	        'filename': 'errors.log'
+        },
+        'security': {
+            'class': 'logging.FileHandler',
+            'formatter': 'format_security',
+	        'filename': 'security.log'
+        },
+	    'mail': {
+	        'level': 'ERROR',
+            'formatter': 'format_mail',
+            'class': 'django.utils.log.AdminEmailHandler'
+	    }
+    },
+
+    'loggers': {
+        'django': {
+            'handlers': ['console_D', 'console_W', 'console_E', 'general'],
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['errors', 'mail'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.server': {
+            'handlers': ['errors', 'mail'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.template': {
+            'handlers': ['errors'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.db.backends': {
+            'handlers': ['errors'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'django.security': {
+            'handlers': ['security'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    }
+}
+

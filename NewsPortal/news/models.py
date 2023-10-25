@@ -4,7 +4,7 @@ from params import *
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.urls import reverse
-from django.core.cache import cache
+#from django.core.cache import cache
 
 news = 'NS'
 article = 'AR'
@@ -61,9 +61,9 @@ class Post(models.Model): # статьи и новости, которые со�
     def get_absolute_url(self):
         return reverse('post_detail', args=[str(self.id)])
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # сначала вызываем метод родителя, чтобы объект сохранился
-        cache.delete(f'post-{self.pk}')  # затем удаляем его из кэша, чтобы сбросить его
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)  # сначала вызываем метод родителя, чтобы объект сохранился
+    #     cache.delete(f'post-{self.pk}')  # затем удаляем его из кэша, чтобы сбросить его
 
 class Comment(models.Model):
     commentPost = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -109,7 +109,7 @@ class Author(models.Model):
         self.save
 
 class Category(models.Model): # Категории новостей/статей
-    name = models.CharField(max_length=255, unique=True)  # название категории, уникальное поле
+    name = models.CharField(max_length=255, unique=True, db_index=True)  # название категории, уникальное поле
     subscribers = models.ManyToManyField(User, through='SubscribersCategory')  # категории публикаций
 
     def __str__(self):

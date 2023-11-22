@@ -31,6 +31,7 @@ urlpatterns = [
    path('category/<int:cat_id>/subscribe', subscribe_on_cat, name='subscribe'),
    path('category/<int:cat_id>/unsubscribe', unsubscribe_cat, name='unsubscribe'),
    path('category/<int:cat_id>/', show_category, name='category'),
+   path('user/stz/', set_timezone, name='set_timezone'),
    #path('news/limit/', news_limit, name='news_limit'),
 
 ]

@@ -12,7 +12,7 @@ from .filters import *
 from .forms import *
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.utils import timezone
-import pytz
+import pytz  #  импортируем стандартный модуль для работы с часовыми поясами
 from django.utils.translation import gettext as _
 from django.utils import timezone
 from .models import Post, POST_TYPES, news as string_news, article as string_article
@@ -255,7 +255,7 @@ class BaseRegisterView(CreateView):
         return redirect('post_list')
 
 
-@login_required
+@login_required # декоратор, что пользователь залогинился
 def upgrade_me(request):
     user = request.user
     authors_group = Group.objects.get(name='authors')
@@ -301,6 +301,35 @@ def show_category(request, cat_id):
     }
     print(get_random_secret_key())
     return render(request, 'news/posts.html', context=context)
+
+def set_timezone(request):
+    if request.method == 'POST':
+        request.session['django_timezone'] = request.POST['timezone']
+        return redirect('postlist')
+    else:
+        return render(request, 'news/postlist.html', {'timezones': pytz.common_timezones})
+
+
+class Index(View):
+    def get(self, request):
+        curent_time = timezone.now()
+
+        # .  Translators: This message appears on the home page only
+        models = MyModel.objects.all()
+
+        context = {
+            'models': models,
+            'current_time': timezone.now(),
+            'timezones': pytz.common_timezones  # добавляем в контекст все доступные часовые пояса
+        }
+
+        return HttpResponse(render(request, 'index.html', context))
+
+    #  по пост-запросу будем добавлять в сессию часовой пояс, который и будет обрабатываться написанным нами ранее middleware
+    def post(self, request):
+        request.session['django_timezone'] = request.POST['timezone']
+        return redirect('/')
+
 
 #def news_limit(request):
 #    return render(request, 'news/post_limit.html')

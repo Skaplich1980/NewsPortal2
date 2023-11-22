@@ -37,7 +37,7 @@ def task_mail_on_post(post_id, user_id):  # задача выслать элек
 
 
 @shared_task
-def task_mail_week(post_id, user_id):  # задача выслать электронное письмо в html формате при создании новости
+def task_mail_week(post_id, user_id):  
     # определить время неделю
     week_back = datetime.today() - timedelta(days=7)
     cats = Category.objects.all()  # берем все категории

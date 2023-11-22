@@ -14,6 +14,12 @@ from django.core.mail import send_mail, EmailMultiAlternatives
 @receiver(m2m_changed, sender=Post.categories.through)
 # m2m_changed возникает при изменении ManyToManyField модели.
 def send_mail_on_post(sender, action, instance, **kwargs):
+
+# если не прописали в событиях  action, то можно к нему обратиться
+# if kwargs['action']='post_add': ...
+
+
+
     # отправляем письмо
     if action == 'post_add':  # если событие добавление поста
         cats = instance.categories.all()  # берем все категории
